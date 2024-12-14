@@ -17,6 +17,8 @@ class Interface:
         self.grid_width = width // CELL_SIZE
         self.grid_height = height // CELL_SIZE
         self.obstacles = self.generate_obstacles()
+        # Chargement du nouvel arrière-plan
+        self.background = pygame.image.load("ninja_village_background.jpg").convert()
 
     def generate_obstacles(self):
         #génère des obstacles à des positions aléatoires
