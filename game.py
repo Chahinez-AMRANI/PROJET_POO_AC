@@ -20,20 +20,18 @@ class Game:
     """
 
     def __init__(self, screen):
-        """
-        Construit le jeu avec la surface de la fenêtre.
-
-        Paramètres
-        ----------
-        screen : pygame.Surface
-            La surface de la fenêtre du jeu.
-        """
         self.screen = screen
-        self.player_units = [Unit(0, 0, 10, 2, 'player'),
-                             Unit(1, 0, 10, 2, 'player')]
-
-        self.enemy_units = [Unit(6, 6, 8, 1, 'enemy'),
-                            Unit(7, 6, 8, 1, 'enemy')]
+        self.interface = Interface(screen, WIDTH, HEIGHT)
+        self.player_units = [
+            Ninja(0, 0, 'player'),
+            Samurai(1, 0, 'player'),
+            Archer(2, 0, 'player')
+        ]
+        self.enemy_units = [
+            Ninja(6, 6, 'enemy'),
+            Samurai(7, 6, 'enemy'),
+            Archer(5, 6, 'enemy')
+        ]
 
     def handle_player_turn(self):
         """Tour du joueur"""
