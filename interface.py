@@ -3,12 +3,11 @@ import random
 
 # cette interface a une MAP
 # Initialisation des constantes
-WIDTH, HEIGHT = 800, 600
 CELL_SIZE = 40
 BLACK = (0, 0, 0)
-DARK_GRAY = (50, 50, 50)
-TREE_COLOR = (34, 139, 34)  # Vert pour les arbres
-WALL_COLOR = (139, 69, 19)  # Brun pour les murs
+WHITE = (255, 255, 255)
+TREE_COLOR = (34, 139, 34)
+WALL_COLOR = (139, 69, 19)
 
 class Interface:
     def __init__(self, screen, width, height):
@@ -20,12 +19,12 @@ class Interface:
         self.obstacles = self.generate_obstacles()
 
     def generate_obstacles(self):
-        """Génère des positions aléatoires pour les obstacles."""
+        #génère des obstacles à des positions aléatoires
         obstacles = []
         for _ in range(20):  # Nombre d'obstacles
             x = random.randint(0, self.grid_width - 1)
             y = random.randint(0, self.grid_height - 1)
-            obstacles.append((x, y, "tree" if random.random() < 0.5 else "wall"))
+             obstacles.append((x, y, random.choice(["tree", "wall"])))
         return obstacles
 
     def draw_grid(self):
@@ -37,35 +36,14 @@ class Interface:
                 pygame.draw.rect(self.screen, DARK_GRAY, rect, 1)
 
     def draw_obstacles(self):
-        """Dessine les obstacles sur la carte."""
         for x, y, obstacle_type in self.obstacles:
-            rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
             color = TREE_COLOR if obstacle_type == "tree" else WALL_COLOR
+            rect = pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
             pygame.draw.rect(self.screen, color, rect)
 
-    def draw_units(self, player_units, enemy_units):
-        """Dessine les unités."""
+     def flip_display(self, player_units, enemy_units):
+        self.draw_grid()
+        self.draw_obstacles()
         for unit in player_units + enemy_units:
             unit.draw(self.screen)
-
-    def run(self, player_units, enemy_units):
-        """Boucle principale du jeu."""
-        self.draw_grid()  # Dessine la grille
-        self.draw_obstacles()  # Dessine les obstacles
-        self.draw_units(player_units, enemy_units)  # Dessine les unités des joueurs et ennemis
-
-# Correction des positions d'éléments : vérifiez les unités
-class Unit:
-    def __init__(self, x, y, color):
-        self.x = x
-        self.y = y
-        self.color = color
-
-    def draw(self, screen):
-        """Dessine l'unité centrée dans la cellule."""
-        pygame.draw.circle(
-            screen,
-            self.color,
-            (self.x * CELL_SIZE + CELL_SIZE // 2, self.y * CELL_SIZE + CELL_SIZE // 2),  # Correction des positions
-            CELL_SIZE // 3,
-        )
+        pygame.display.flip()
