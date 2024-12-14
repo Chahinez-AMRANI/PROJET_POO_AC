@@ -17,13 +17,18 @@ def attack_effect(user, target):
     target.take_damage(damage)
 
 def defense_effect(user, target):
-    #génère un bouclier temporaire 
-    shield_value = user.speed // 2 + random.randint(5, 10)  # Calcul du bouclier
+    shield_value = user.attack_power // 2 + random.randint(5, 10)
     if hasattr(target, "shield"):
-        target.shield += shield_value  # Ajoute au bouclier existant
-    else:
-        target.shield = shield_value  # Crée un bouclier si inexistant
-    print(f"{target.name} génère un bouclier de {shield_value} points.")
+        target.shield += shield_value
+
+def evasion_effect(user, target):
+    if hasattr(target, "dodge_chance"):
+        target.dodge_chance = min(100, target.dodge_chance + 20)
+
+def slash_effect(user, target):
+    if abs(user.x - target.x) <= 1 and abs(user.y - target.y) <= 1:
+        damage = user.attack_power + random.randint(5, 10)
+        target.health -= damage
     
 # Compétences
 class Fireball:
