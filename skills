@@ -46,4 +46,29 @@ class Shield:
         self.range = 0
         self.zone = 0
         self.effect = defense_effect
+class Arrows(Skill):
+    def __init__(self):
+        self.name = "Arrows"
+        self.power = 7
+        self.range = 3
+        self.zone = 3
+        self.effect = attack_effect
+
+
+class Evasion(Skill):
+    def __init__(self):
+        self.name = "Evasion"
+        self.power = 0
+        self.range = 0
+        self.zone = 0
+        self.effect = evasion_effect
+
+
+class Slash(Skill):
+    def __init__(self):
+        self.name = "Slash"
+        self.power = 15
+        self.range = 1
+        self.zone = 0
+        self.effect = slash_effect
 
