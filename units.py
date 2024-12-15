@@ -13,6 +13,10 @@ class Unit:
         self.is_selected = False
         self.skills = []  # Liste des compétences
 
+        # Effet visuel temporaire
+        self.effect_color = None
+        self.effect_timer = 0
+
         # Charger l'image de l'unité
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (CELL_SIZE, CELL_SIZE))
@@ -27,6 +31,8 @@ class Unit:
         """Attaque une unité cible."""
         if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
             target.health -= self.attack_power
+            target.effect_color = (255, 0, 0)  # Rouge pour un effet visuel d'attaque
+            target.effect_timer = 15  # Durée de l'effet en frames
 
     def draw(self, screen):
         """Dessine l'unité sur la grille."""
@@ -36,23 +42,33 @@ class Unit:
                 (self.x * CELL_SIZE + CELL_SIZE // 2, self.y * CELL_SIZE + CELL_SIZE // 2),
                 CELL_SIZE // 2, 3
             )
-        # Dessiner l'image de l'unité
-        screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
+
+        # Applique un effet visuel temporaire
+        if self.effect_timer > 0:
+            temp_surface = self.image.copy()
+            temp_surface.fill(self.effect_color, special_flags=pygame.BLEND_RGBA_MULT)
+            screen.blit(temp_surface, (self.x * CELL_SIZE, self.y * CELL_SIZE))
+            self.effect_timer -= 1
+        else:
+            screen.blit(self.image, (self.x * CELL_SIZE, self.y * CELL_SIZE))
 
 
 class Ninja(Unit):
     def __init__(self, x, y, team):
-        super().__init__(x, y, health=20, attack_power=10, team=team, image_path="ninja.jpg")
+        image_path = "alter_ninja.jpg" if team == 'enemy' else "ninja.jpg"
+        super().__init__(x, y, health=20, attack_power=10, team=team, image_path=image_path)
         self.skills = [Fireball(), Evasion()]
 
 
 class Samurai(Unit):
     def __init__(self, x, y, team):
-        super().__init__(x, y, health=30, attack_power=8, team=team, image_path="samurai.jpg")
+        image_path = "alter_samurai.jpg" if team == 'enemy' else "samurai.jpg"
+        super().__init__(x, y, health=30, attack_power=8, team=team, image_path=image_path)
         self.skills = [Slash(), Shield()]
 
 
 class Archer(Unit):
     def __init__(self, x, y, team):
-        super().__init__(x, y, health=15, attack_power=7, team=team, image_path="archer.jpg")
+        image_path = "alter_archer.jpg" if team == 'enemy' else "archer.jpg"
+        super().__init__(x, y, health=15, attack_power=7, team=team, image_path=image_path)
         self.skills = [Arrows(), Evasion()]
