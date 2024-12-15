@@ -28,14 +28,14 @@ class Unit:
             self.y += dy
 
     def attack(self, target):
-        """Attaque une unité cible."""
+        #Attaque une unité cible
         if abs(self.x - target.x) <= 1 and abs(self.y - target.y) <= 1:
             target.health -= self.attack_power
             target.effect_color = (255, 0, 0)  # Rouge pour un effet visuel d'attaque
             target.effect_timer = 15  # Durée de l'effet en frames
 
     def draw(self, screen):
-        """Dessine l'unité sur la grille."""
+        #Dessine l'unité sur la grille
         if self.is_selected:
             pygame.draw.circle(
                 screen, (0, 255, 0),
