@@ -15,7 +15,14 @@ class Interface:
         self.grid_width = width // CELL_SIZE
         self.grid_height = height // CELL_SIZE
         self.obstacles = self.generate_obstacles()
-        # Chargement du nouvel arrière-plan
+
+        # Backgrounds pour l'accueil et la sélection
+        self.background_home = pygame.image.load("main.jpg").convert()
+        self.background_home = pygame.transform.scale(self.background_home, (width, height))
+        self.background_selection = pygame.image.load("selection.jpg").convert()
+        self.background_selection = pygame.transform.scale(self.background_selection, (width, height))
+
+        # Terrain du jeu
         self.background = pygame.image.load("field.jpg").convert()
 
     def generate_obstacles(self):
@@ -27,9 +34,7 @@ class Interface:
         return obstacles
 
     def draw_grid(self):
-        # Dessine l'arrière-plan avant la grille
         self.screen.blit(self.background, (0, 0))
-        # Dessine les lignes de la grille par-dessus
         for x in range(0, self.width, CELL_SIZE):
             for y in range(0, self.height, CELL_SIZE):
                 rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
@@ -45,8 +50,63 @@ class Interface:
         for unit in player_units + enemy_units:
             unit.draw(self.screen)
 
+    def show_home_screen(self):
+        """Affiche l'écran d'accueil avec un bouton 'Play'."""
+        font = pygame.font.Font(None, 72)
+        running = True
+
+        while running:
+            self.screen.blit(self.background_home, (0, 0))  # Affiche le background de l'accueil
+            text = font.render("Press Enter to Play", True, BLACK)
+            self.screen.blit(text, (self.width // 2 - 200, self.height // 2))
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Touche Entrée pour jouer
+                    running = False
+
+    def show_unit_selection(self):
+        """Affiche un écran de sélection d'unités."""
+        font = pygame.font.Font(None, 36)
+        unit_names = ["Ninja", "Samurai", "Archer"]
+        current_index = 0
+        selected_units = []
+
+        while len(selected_units) < 2:
+            self.screen.blit(self.background_selection, (0, 0))  # Affiche le background de la sélection
+            for idx, name in enumerate(unit_names):
+                color = (0, 255, 0) if idx == current_index else WHITE
+                text = font.render(name, True, color)
+                self.screen.blit(text, (self.width // 4 * (idx + 1) - 50, self.height // 2))
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        current_index = (current_index - 1) % len(unit_names)
+                    elif event.key == pygame.K_RIGHT:
+                        current_index = (current_index + 1) % len(unit_names)
+                    elif event.key == pygame.K_RETURN:  # Touche Entrée pour sélectionner une unité
+                        selected_units.append(unit_names[current_index])
+                        print(f"Vous avez sélectionné : {unit_names[current_index]}")
+
+        return selected_units
+
+    def highlight_targets(self, screen, targets, current_index):
+        """Surligne les cibles disponibles et indique la cible actuellement sélectionnée."""
+        for i, target in enumerate(targets):
+            color = (255, 0, 0) if i == current_index else (255, 255, 0)
+            rect = pygame.Rect(target.x * CELL_SIZE, target.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pygame.draw.rect(screen, color, rect, 3)
+
     def draw_skills(self, unit):
-        # Affiche les compétences disponibles pour le joueur
         if not unit.skills:
             return
 
@@ -56,51 +116,7 @@ class Interface:
             skill_text += f"{idx + 1} - {skill.name}  "
 
         skill_surface = font.render(skill_text, True, (255, 255, 255))
-        self.screen.blit(skill_surface, (10, self.height - 30))  # En bas de l'écran
-
-    def display_skill_effect(self, skill, target):
-        # Affiche un effet visuel lors de l'utilisation d'une compétence
-        font = pygame.font.Font(None, 36)
-        text_surface = font.render(f"{skill.name} activated!", True, (255, 255, 255))
-        self.screen.blit(text_surface, (10, 10))
-        pygame.display.flip()
-        pygame.time.delay(1000)
-
-        if skill.name == "Fireball":
-            pygame.draw.circle(
-                self.screen,
-                (255, 0, 0),  # Rouge pour Fireball
-                (target.x * CELL_SIZE + CELL_SIZE // 2, target.y * CELL_SIZE + CELL_SIZE // 2),
-                CELL_SIZE // 2,
-                3
-            )
-        elif skill.name == "Shield":
-            pygame.draw.circle(
-                self.screen,
-                (0, 255, 255),  # Cyan pour Shield
-                (target.x * CELL_SIZE + CELL_SIZE // 2, target.y * CELL_SIZE + CELL_SIZE // 2),
-                CELL_SIZE // 2,
-                3
-            )
-        elif skill.name == "Arrows":
-            pygame.draw.line(
-                self.screen,
-                (0, 255, 0),  # Vert pour Arrows
-                (target.x * CELL_SIZE, target.y * CELL_SIZE),
-                (target.x * CELL_SIZE + CELL_SIZE, target.y * CELL_SIZE + CELL_SIZE),
-                3
-            )
-        elif skill.name == "Slash":
-            pygame.draw.line(
-                self.screen,
-                (255, 255, 0),  # Jaune pour Slash
-                (target.x * CELL_SIZE, target.y * CELL_SIZE),
-                (target.x * CELL_SIZE + CELL_SIZE, target.y * CELL_SIZE + CELL_SIZE),
-                5
-            )
-
-        pygame.display.flip()
-        pygame.time.delay(1000)  # Pause pour afficher l'effet
+        self.screen.blit(skill_surface, (10, self.height - 30))
 
     def flip_display(self, player_units, enemy_units):
         self.draw_grid()
